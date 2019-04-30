@@ -19,6 +19,7 @@ from sklearn.naive_bayes import GaussianNB
 from pandas.plotting import scatter_matrix
 from sklearn.metrics import accuracy_score
 import pickle
+from sklearn import preprocessing
 
 
 df = pd.read_csv('test.csv')
@@ -86,6 +87,7 @@ new_df['label']= new_df[forecast_col].shift(-forecast_out)
 # # # get x value and y value of as rest of the data column and label column
 #
 X = np.array(new_df.drop(['label'],1)) # all columns, other than label column
+X = preprocessing.scale(X)
 X = X[:-forecast_out]
 X_lately = X[-forecast_out:]
 new_df.dropna(inplace=True)
@@ -177,11 +179,16 @@ print ("next_date array is: ", next_date_array)
 newDf = pd.DataFrame(columns=['Date','Price'])
 
 
+
 newDf = pd.DataFrame({'Date': next_date_array[:],'Price': Forecast_set[:]})
 #original_Data= pd.DataFrame({'Date': next_date_array[:],'Price': original_DataFrame['Price']})
 print ("newDf is: ---->", newDf)
 
+# this just to get comparison price with Real Price
 
+Forecast_DataFrame= pd.DataFrame(Forecast_set)
+print ("Forecast DataFrame is ", Forecast_DataFrame)
+Forecast_DataFrame.to_csv('Forecast.csv')
 # let's do the same dataframe
 
 
@@ -198,13 +205,15 @@ print ("newDf is: ---->", newDf)
 #new_df['Price']= Forecast_set
 # print (new_df)
 
+
+
 #------------------------------------------------------
-new_df['Close'].plot()
+#new_df['Close'].plot()
 new_df['Forecast'].plot()
 
 plt.title("January 1st, 2016 To January 1st, 2019 bitcoin Stock price and 30 day forecast")
 plt.legend(loc=4)
 plt.xlabel('Date')
 plt.ylabel('Price')
-plt.show()
+#plt.show()
 

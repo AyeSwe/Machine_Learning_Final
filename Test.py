@@ -13,7 +13,7 @@ import numpy as np
 from pandas.plotting import scatter_matrix
 from sklearn.metrics import accuracy_score
 
-symbol= 'BTC-USD'
+#symbol= 'BTC-USD'
 
 # start = dt.datetime(2016,1,1)
 # end = dt.datetime(2019,1,1)

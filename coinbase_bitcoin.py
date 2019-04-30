@@ -18,37 +18,38 @@ import time
 import datetime
 from pandas.plotting import scatter_matrix
 from sklearn.metrics import accuracy_score
+import pickle
 
 
 
-# r = requests.get('https://api.coindesk.com/v1/bpi/historical/close.json?start=2016-01-01&end=2019-01-02').json()
-# print(r)
-# #sending jason file into the dat frame
-# df = pd.DataFrame(r, columns=['bpi'])
-# #df.to_csv('coindesk.csv')
-# print (df.info())
-# # drop the null values
-# df.dropna(inplace=True)
-#
-# #split a cloumn to two column
-#
-# #since "bpi" is one columns with values and key dictionary type
-#
-# # sending values of the bpi as price
-# Price = df['bpi'].values
-# #print (Price)
-#
-# # sending key (Dates) of the bpi as Date
-# Date= df['bpi'].keys()
-# #print (Date)
-#
-# # making a new data frame with columns labels
-# newDf = pd.DataFrame(columns=['Date','Close'])
-# newDf['Date']= Date # fill the column with Date
-# newDf['Close']= Price# fill the column with Prices
-#
-# newDf.to_csv('coindesk.csv')
-# ---------------new code from Test.py below------------------
+r = requests.get('https://api.coindesk.com/v1/bpi/historical/close.json?start=2016-01-01&end=2019-01-02').json()
+print(r)
+#sending jason file into the dat frame
+df = pd.DataFrame(r, columns=['bpi'])
+#df.to_csv('coindesk.csv')
+print (df.info())
+# drop the null values
+df.dropna(inplace=True)
+
+#split a cloumn to two column
+
+#since "bpi" is one columns with values and key dictionary type
+
+# sending values of the bpi as price
+Price = df['bpi'].values
+#print (Price)
+
+# sending key (Dates) of the bpi as Date
+Date= df['bpi'].keys()
+#print (Date)
+
+# making a new data frame with columns labels
+newDf = pd.DataFrame(columns=['Date','Close'])
+newDf['Date']= Date # fill the column with Date
+newDf['Close']= Price# fill the column with Prices
+
+newDf.to_csv('coindesk.csv')
+#---------------new code from Test.py below------------------
 
 
 
@@ -88,33 +89,29 @@ df.dropna(inplace=True)
 # #
 print (df.tail())
 
-# # get x value and y value of as rest of the data column and label column
-# x = np.array(df.drop(['Close'],1))
-# y = np.array(df['Close'])
-# x = df.iloc[:,: -1]
-# y = df.iloc[:,-1]
-# print ("X is --->\n",x)
-# print ("\ny is --->\n",y)
+
 
 x = np.array(df.drop(['Close'],1)) # all columns, other than label column
 y = np.array(df['Close'])# only label column
-#
-# # get testing set and training set
-#
-# #split the dataset with a random seed
-# # training size is the 80% of the data set
-#
-x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.2)
-# # print ("X train is ",x_train)
-# print ("y train is ",y_train)
-# print ("X test is ",x_test)
-# print ("y test is ",y_test)
-#
 
 #
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.2)
+
 # Linear regression model
-linear_regression = LinearRegression()
-linear_regression.fit(x_train,y_train)
+# linear_regression = LinearRegression()
+# linear_regression.fit(x_train,y_train)
+
+# # ---------Pickling-----------
+#
+# # with open ('linearregressionCoinDeskFitted.pickle', 'wb') as f:
+# #     pickle.dump(linear_regression,f)
+
+
+pickled = open('linearregressionCoinDeskFitted.pickle','rb')
+linear_regression = pickle.load(pickled)
+
+
+
 
 LinearRegression(copy_X= True, fit_intercept=True,n_jobs=1, normalize=False)
 accuracy = linear_regression.score(x_test,y_test)
@@ -129,9 +126,8 @@ X = x[:-forecast_out]
 # # # old one
 #
 X_lately = x[-forecast_out:]
-# #print(X_lately)
-# print(new_df.tail(30))
-# # #predit the stock price for the bitcoin for next 0.1% of the day which is 4 day for here
+
+
 Forecast_set = linear_regression.predict(X_lately)
 print (Forecast_set)
 
@@ -143,19 +139,14 @@ last_date = df.iloc[-1].name
 
 # print ("last date is: " , last_date)
 last_date = time.mktime(datetime.datetime.strptime(last_date,"%Y-%m-%d").timetuple())
-# print ("timestamp is: ",last_date)
-#
-#
-#
+
 one_day = 86400
 next_unix = last_date + 86400
-# print ("next unix is: ", next_unix)
+
 
 ## just to show the forcast_set with Price values
 label_arry = np.array(df['label'])
 
-# for j in
-#     for i in Forecast_set
 
 next_date_array= []
 # # just visualization ( later get inside the
@@ -167,12 +158,6 @@ for i in Forecast_set:
     #print (("Splited string next date is:", next_date[0]))
     next_date = next_date[0]
     next_date_array.append(next_date) # just to get an arrray for later use
-
-
-
-
-
-    # this should be in function (change it later)
     next_unix +=one_day
     df.loc[next_date] = [np.nan for _ in range(len(df.columns)-1)] +[i]
 
@@ -185,7 +170,7 @@ newDf = pd.DataFrame(columns=['Date','Price'])
 
 
 newDf = pd.DataFrame({'Date': next_date_array[:],'Price': Forecast_set[:]})
-#original_Data= pd.DataFrame({'Date': next_date_array[:],'Price': original_DataFrame['Price']})
+
 print ("newDf is: ---->", newDf)
 
 
